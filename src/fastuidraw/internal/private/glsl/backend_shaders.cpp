@@ -832,6 +832,18 @@ create_brush_shader(void)
     .set(PainterBrush::gradient_end_radius_offset, ".r1")
     .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_radial_gradient_data)");
 
+  UnpackSourceGenerator("mat2")
+    .set(PainterBrush::transformation_matrix_col0_row0_offset, "[0][0]")
+    .set(PainterBrush::transformation_matrix_col1_row0_offset, "[1][0]")
+    .set(PainterBrush::transformation_matrix_col0_row1_offset, "[0][1]")
+    .set(PainterBrush::transformation_matrix_col1_row1_offset, "[1][1]")
+    .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_transformation_matrix)");
+
+  UnpackSourceGenerator("vec2")
+    .set(PainterBrush::transformation_translation_x_offset, ".x")
+    .set(PainterBrush::transformation_translation_y_offset, ".y")
+    .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_transformation_translation)");
+
   brush_varyings
     .add_float("fastuidraw_brush_p_x")
     .add_float("fastuidraw_brush_p_y")
@@ -869,6 +881,16 @@ create_brush_shader(void)
     .add_alias("fastuidraw_brush_gradient_p1_y", "fastuidraw_brush_gradient_sweep_sign_factor");
 
   brush_macros
+    .add_macro_u32("fastuidraw_brush_header_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::header_data_size))
+    .add_macro_u32("fastuidraw_brush_image_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::image_data_size))
+    .add_macro_u32("fastuidraw_brush_linear_gradient_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::linear_gradient_data_size))
+    .add_macro_u32("fastuidraw_brush_sweep_gradient_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::sweep_gradient_data_size))
+    .add_macro_u32("fastuidraw_brush_radial_gradient_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::radial_gradient_data_size))
+    .add_macro_u32("fastuidraw_brush_repeat_window_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::repeat_window_data_size))
+    .add_macro_u32("fastuidraw_brush_transformation_matrix_num_blocks",
+                   FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::transformation_matrix_data_size))
+    .add_macro_u32("fastuidraw_brush_transformation_translation_num_blocks",
+                   FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::transformation_translation_data_size))
     .add_macro_u32("fastuidraw_brush_image_mask", PainterBrush::image_mask)
     .add_macro_u32("fastuidraw_brush_image_filter_bit0", PainterBrush::image_filter_bit0)
     .add_macro_u32("fastuidraw_brush_image_filter_num_bits", PainterBrush::image_filter_num_bits)

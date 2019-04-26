@@ -159,7 +159,7 @@ FASTUIDRAW_LOCAL(fastuidraw_read_brush_radial_gradient_data)(in uint location,
                                                              out FASTUIDRAW_LOCAL(fastuidraw_brush_gradient) grad);
 
 void
-FASTUIDRAW_LOCAL(fastuidraw_process_image_data_common)(in fastuidraw_brush_image_data_raw raw,
+FASTUIDRAW_LOCAL(fastuidraw_process_image_data_common)(in FASTUIDRAW_LOCAL(fastuidraw_brush_image_data_raw) raw,
                                                        out FASTUIDRAW_LOCAL(fastuidraw_brush_image_data) cooked)
 {
   cooked.image_size.x = FASTUIDRAW_EXTRACT_BITS(fastuidraw_brush_image_size_x_bit0,
@@ -244,11 +244,11 @@ FASTUIDRAW_LOCAL(fastuidraw_read_brush_image_data)(in uint location, in uint ima
                                                    out FASTUIDRAW_LOCAL(fastuidraw_brush_image_data) image)
 {
   uint return_value;
-  fastuidraw_brush_image_data_raw raw;
+  FASTUIDRAW_LOCAL(fastuidraw_brush_image_data_raw) raw;
 
   return_value = FASTUIDRAW_LOCAL(fastuidraw_read_brush_image_raw_data)(location, raw);
 
-  fastuidraw_process_image_data_common(raw, image);
+  FASTUIDRAW_LOCAL(fastuidraw_process_image_data_common)(raw, image);
   #ifndef FASTUIDRAW_IMAGE_ATLAS_DISABLED
   if (image_type == uint(fastuidraw_brush_image_type_on_atlas))
     {
@@ -267,7 +267,7 @@ FASTUIDRAW_LOCAL(fastuidraw_read_brush_linear_or_sweep_gradient_data)(in uint lo
                                                                       out FASTUIDRAW_LOCAL(fastuidraw_brush_gradient) grad)
 {
   uint return_value;
-  fastuidraw_brush_gradient_raw raw;
+  FASTUIDRAW_LOCAL(fastuidraw_brush_gradient_raw) raw;
 
   return_value = FASTUIDRAW_LOCAL(fastuidraw_read_brush_linear_or_sweep_gradient_data)(location, raw);
   raw.r0 = 0.0;
@@ -281,7 +281,7 @@ FASTUIDRAW_LOCAL(fastuidraw_read_brush_radial_gradient_data)(in uint location,
                                                              out FASTUIDRAW_LOCAL(fastuidraw_brush_gradient) grad)
 {
   uint return_value;
-  fastuidraw_brush_gradient_raw raw;
+  FASTUIDRAW_LOCAL(fastuidraw_brush_gradient_raw) raw;
 
   return_value = FASTUIDRAW_LOCAL(fastuidraw_read_brush_radial_gradient_data)(location, raw);
   FASTUIDRAW_LOCAL(fastuidraw_process_gradient_data)(raw, grad);

@@ -429,21 +429,10 @@ add_backend_constants(const fastuidraw::glsl::PainterShaderRegistrarGLSLTypes::B
     }
 
   src
-    .add_macro_u32("fastuidraw_colorStopAtlas_size", backend.colorstop_atlas_store_width())
-    .add_macro("fastuidraw_colorStopAtlas_size_reciprocal", "(1.0 / float(fastuidraw_colorStopAtlas_size) )")
-
-    .add_macro_u32("fastuidraw_brush_header_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::header_data_size))
-    .add_macro_u32("fastuidraw_brush_image_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::image_data_size))
-    .add_macro_u32("fastuidraw_brush_linear_gradient_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::linear_gradient_data_size))
-    .add_macro_u32("fastuidraw_brush_sweep_gradient_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::sweep_gradient_data_size))
-    .add_macro_u32("fastuidraw_brush_radial_gradient_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::radial_gradient_data_size))
-    .add_macro_u32("fastuidraw_brush_repeat_window_num_blocks", FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::repeat_window_data_size))
-    .add_macro_u32("fastuidraw_brush_transformation_matrix_num_blocks",
-                   FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::transformation_matrix_data_size))
-    .add_macro_u32("fastuidraw_brush_transformation_translation_num_blocks",
-                   FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterBrush::transformation_translation_data_size))
     .add_macro_u32("fastuidraw_stroke_dashed_stroking_params_header_num_blocks",
-                   FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterDashedStrokeParams::stroke_static_data_size));
+                   FASTUIDRAW_NUMBER_BLOCK4_NEEDED(PainterDashedStrokeParams::stroke_static_data_size))
+    .add_macro_u32("fastuidraw_colorStopAtlas_size", backend.colorstop_atlas_store_width())
+    .add_macro("fastuidraw_colorStopAtlas_size_reciprocal", "(1.0 / float(fastuidraw_colorStopAtlas_size) )");
 }
 
 void
@@ -525,21 +514,6 @@ stream_unpack_code(fastuidraw::glsl::ShaderSource &str,
 {
   using namespace fastuidraw;
   using namespace fastuidraw::glsl;
-
-  if (render_type == PainterSurface::color_buffer_type)
-    {
-      UnpackSourceGenerator("mat2")
-        .set(PainterBrush::transformation_matrix_col0_row0_offset, "[0][0]")
-        .set(PainterBrush::transformation_matrix_col1_row0_offset, "[1][0]")
-        .set(PainterBrush::transformation_matrix_col0_row1_offset, "[0][1]")
-        .set(PainterBrush::transformation_matrix_col1_row1_offset, "[1][1]")
-        .stream_unpack_function(str, "fastuidraw_read_brush_transformation_matrix");
-
-      UnpackSourceGenerator("vec2")
-        .set(PainterBrush::transformation_translation_x_offset, ".x")
-        .set(PainterBrush::transformation_translation_y_offset, ".y")
-        .stream_unpack_function(str, "fastuidraw_read_brush_transformation_translation");
-    }
 
   UnpackSourceGenerator("fastuidraw_header")
     .set(PainterHeader::clip_equations_location_offset, ".clipping_location", UnpackSourceGenerator::uint_type)
