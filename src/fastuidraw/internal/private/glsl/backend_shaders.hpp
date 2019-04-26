@@ -139,6 +139,9 @@ private:
   PainterGlyphShader
   create_glyph_shader(void);
 
+  reference_counted_ptr<PainterBrushShader>
+  create_brush_shader(void);
+
   /*
    * stroke_dash_style having value number_cap_styles means
    * to not have dashed stroking.

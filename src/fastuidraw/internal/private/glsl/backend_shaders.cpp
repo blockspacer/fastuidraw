@@ -783,53 +783,45 @@ create_fill_shader(void)
   return fill_shader;
 }
 
-PainterShaderSet
+reference_counted_ptr<PainterBrushShader>
 ShaderSetCreator::
-create_shader_set(void)
+create_brush_shader(void)
 {
-  PainterShaderSet return_value;
-  reference_counted_ptr<const StrokingDataSelectorBase> se;
   reference_counted_ptr<PainterBrushShader> br;
   ShaderSource::MacroSet brush_macros;
   varying_list brush_varyings;
   ShaderSource str;
 
-  se = PainterStrokeParams::stroking_data_selector(false);
-
-  /* TODO: localize all these functions with FASTUIDRAW_LOCAL
-   * and localize the routines in the .glsl.resource_string
-   * files as well.
-   */
-  UnpackSourceGenerator("fastuidraw_brush_header")
+  UnpackSourceGenerator("FASTUIDRAW_LOCAL(fastuidraw_brush_header)")
     .set(PainterBrush::features_offset, ".features", UnpackSourceGenerator::uint_type)
     .set(PainterBrush::header_red_green_offset, ".red_green", UnpackSourceGenerator::uint_type)
     .set(PainterBrush::header_blue_alpha_offset, ".blue_alpha", UnpackSourceGenerator::uint_type)
-    .stream_unpack_function(str, "fastuidraw_read_brush_header");
+    .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_header)");
 
-  UnpackSourceGenerator("fastuidraw_brush_repeat_window")
+  UnpackSourceGenerator("FASTUIDRAW_LOCAL(fastuidraw_brush_repeat_window)")
     .set(PainterBrush::repeat_window_x_offset, ".xy.x")
     .set(PainterBrush::repeat_window_y_offset, ".xy.y")
     .set(PainterBrush::repeat_window_width_offset, ".wh.x")
     .set(PainterBrush::repeat_window_height_offset, ".wh.y")
-    .stream_unpack_function(str, "fastuidraw_read_brush_repeat_window");
+    .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_repeat_window)");
 
-  UnpackSourceGenerator("fastuidraw_brush_image_data_raw")
+  UnpackSourceGenerator("FASTUIDRAW_LOCAL(fastuidraw_brush_image_data_raw)")
     .set(PainterBrush::image_atlas_location_xyz_offset, ".image_atlas_location_xyz", UnpackSourceGenerator::uint_type)
     .set(PainterBrush::image_size_xy_offset, ".image_size_xy", UnpackSourceGenerator::uint_type)
     .set(PainterBrush::image_start_xy_offset, ".image_start_xy", UnpackSourceGenerator::uint_type)
     .set(PainterBrush::image_number_lookups_offset, ".image_number_lookups", UnpackSourceGenerator::uint_type)
-    .stream_unpack_function(str, "fastuidraw_read_brush_image_raw_data");
+    .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_image_raw_data)");
 
-  UnpackSourceGenerator("fastuidraw_brush_gradient_raw")
+  UnpackSourceGenerator("FASTUIDRAW_LOCAL(fastuidraw_brush_gradient_raw)")
     .set(PainterBrush::gradient_p0_x_offset, ".p0.x")
     .set(PainterBrush::gradient_p0_y_offset, ".p0.y")
     .set(PainterBrush::gradient_p1_x_offset, ".p1.x")
     .set(PainterBrush::gradient_p1_y_offset, ".p1.y")
     .set(PainterBrush::gradient_color_stop_xy_offset, ".color_stop_sequence_xy", UnpackSourceGenerator::uint_type)
     .set(PainterBrush::gradient_color_stop_length_offset, ".color_stop_sequence_length", UnpackSourceGenerator::uint_type)
-    .stream_unpack_function(str, "fastuidraw_read_brush_linear_or_sweep_gradient_data");
+    .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_linear_or_sweep_gradient_data)");
 
-  UnpackSourceGenerator("fastuidraw_brush_gradient_raw")
+  UnpackSourceGenerator("FASTUIDRAW_LOCAL(fastuidraw_brush_gradient_raw)")
     .set(PainterBrush::gradient_p0_x_offset, ".p0.x")
     .set(PainterBrush::gradient_p0_y_offset, ".p0.y")
     .set(PainterBrush::gradient_p1_x_offset, ".p1.x")
@@ -838,7 +830,7 @@ create_shader_set(void)
     .set(PainterBrush::gradient_color_stop_length_offset, ".color_stop_sequence_length", UnpackSourceGenerator::uint_type)
     .set(PainterBrush::gradient_start_radius_offset, ".r0")
     .set(PainterBrush::gradient_end_radius_offset, ".r1")
-    .stream_unpack_function(str, "fastuidraw_read_brush_radial_gradient_data");
+    .stream_unpack_function(str, "FASTUIDRAW_LOCAL(fastuidraw_read_brush_radial_gradient_data)");
 
   brush_varyings
     .add_float("fastuidraw_brush_p_x")
@@ -950,13 +942,25 @@ create_shader_set(void)
                                             .remove_macros(brush_macros),
                                             brush_varyings);
 
+  return br;
+}
+
+PainterShaderSet
+ShaderSetCreator::
+create_shader_set(void)
+{
+  PainterShaderSet return_value;
+  reference_counted_ptr<const StrokingDataSelectorBase> se;
+
+  se = PainterStrokeParams::stroking_data_selector(false);
+
   return_value
     .glyph_shader(create_glyph_shader())
     .stroke_shader(create_stroke_shader(PainterEnums::number_cap_styles, se))
     .dashed_stroke_shader(create_dashed_stroke_shader_set())
     .fill_shader(create_fill_shader())
     .blend_shaders(create_blend_shaders())
-    .brush_shader(br);
+    .brush_shader(create_brush_shader());
   return return_value;
 }
 
